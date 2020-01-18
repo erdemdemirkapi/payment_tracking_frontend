@@ -103,7 +103,7 @@ function Signup() {
             password1.length > 0 && 
             password2.length > 0 && 
             email.length > 0;
-    var passwords = password1 == password2;
+    var passwords = password1 === password2;
 
     if(!items){
 
