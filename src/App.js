@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button, FormGroup, FormControl } from "react-bootstrap";
+import Modal from 'react-modal';
 import {
   BrowserRouter as Router,
   Switch,
@@ -11,6 +12,17 @@ import "./login.css";
 import "./signup.css";
 import "./App.css";
 import axios from "axios";
+
+const customStyles = {
+  content : {
+    top                   : '50%',
+    left                  : '50%',
+    right                 : 'auto',
+    bottom                : 'auto',
+    marginRight           : '-50%',
+    transform             : 'translate(-50%, -50%)'
+  }
+};
 
 export default function App() {
   return (
@@ -193,7 +205,24 @@ function Signup() {
 function Dashboard() {
   const [data, setData] = useState(null);
 
-  function getItems() {
+  const [note, setNote] = useState("");
+  const [amountCents, setAmountCents] = useState(0);
+  const [amountCurrency, setAmountCurrency] = useState("");
+  const [username, setUsername] = useState("");
+  const [toWhomUsername, setToWhomUsername] = useState("");
+  const [state, setState] = useState("");
+
+  const [modalIsOpen, setIsOpen] = React.useState(false);
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
+  function closeModal(){
+    setIsOpen(false);
+  }
+
+  function getTransactions() {
     axios({
       method: "get",
       url: "http://127.0.0.1:8000/api/v1/transactions/",
@@ -204,23 +233,112 @@ function Dashboard() {
     });
   }
 
+  function addTransactions() {
+    axios({
+      method: "post",
+      url: "http://127.0.0.1:8000/api/v1/transactions/",
+      data: {
+        note: note,
+        amount_cents: amountCents,
+        amount_currency: amountCurrency,
+        username: username,
+        to_whom_username: toWhomUsername,
+        state: state
+      }
+    }).then(obj => {
+      if (obj.status === 200) {
+        console.log("succesful");
+      } else {
+        console.log("error");
+      }
+    });
+  }
+
   return (
     <div>
       <h2>Dashboard</h2>
-      {!data && <Button block type="submit" onClick={getItems}>
-        Get Items
+      {!data && <Button block type="submit" onClick={getTransactions}>
+        Get Transactions
       </Button>}
       {data && <div>
         <ul className="list-group list-group-flush">
           {data.map(item => (
             <li className="list-group-item" key={item.id}>
-              <label className="label">Id:</label> {item.id} |
-              <label className="label">User:</label> {item.user.username} |
-              <label className="label">Amount Cents:</label> {item.amount_cents}
+              <label className="label">User:</label> {item.username} |
+              <label className="label">To Whom:</label> {item.to_whom_username} |
+              <label className="label">Amount Cents:</label> {item.amount_cents} |
+              <label className="label">Amount Currency:</label> {item.amount_currency} |
+              <label className="label">Note:</label> {item.note} |
+              <label className="label">State:</label> {item.state} |
+              <label className="label">Date:</label> {item.created_date} |
             </li>
           ))}
         </ul>
       </div>}
+
+      <div>
+      <Button block type="submit" onClick={openModal}>
+        Add Transactions
+      </Button>
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal}
+          style={customStyles}
+          contentLabel="Add Transaction Modal"
+        >
+          <h2>Add Transaction</h2>
+          <form onSubmit={addTransactions}>
+            <FormGroup controlId="note">
+              <label>Note</label>
+              <FormControl
+                autoFocus
+                type="note"
+                value={note}
+                onChange={e => setNote(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup controlId="amount_cents">
+              <label>Amount Cents</label>
+              <FormControl
+                autoFocus
+                type="amount_cents"
+                value={amountCents}
+                onChange={e => setAmountCents(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup controlId="amount_currency">
+              <label>Amount Currency</label>
+              <FormControl
+                value={amountCurrency}
+                onChange={e => setAmountCurrency(e.target.value)}
+                type="amount_currency"
+              />
+            </FormGroup>
+            <FormGroup controlId="username">
+              <label>Your Username</label>
+              <FormControl
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                type="username"
+              />
+            </FormGroup>
+            <FormGroup controlId="to_whom_username">
+              <label>To Whom Username</label>
+              <FormControl
+                value={toWhomUsername}
+                onChange={e => setToWhomUsername(e.target.value)}
+                type="to_whom_username"
+              />
+            </FormGroup>
+            <Button block type="submit">
+              Add
+            </Button>
+            <Button block type="submit" onClick={closeModal}>
+              Close
+            </Button>
+          </form>
+        </Modal>
+      </div>
     </div>
   );
 }
