@@ -1,106 +1,182 @@
-import React, { Component } from 'react';
-import Modal from 'react-modal';
+import React, { useState } from "react";
+import { Button, FormGroup, FormControl } from "react-bootstrap";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
+import "./login.css";
+import "./signup.css";
 import './App.css';
 import axios from 'axios';
 
-const customStyles = {
-  content : {
-    top                   : '50%',
-    left                  : '50%',
-    right                 : 'auto',
-    bottom                : 'auto',
-    marginRight           : '-50%',
-    transform             : 'translate(-50%, -50%)'
-  }
-};
+export default function BasicExample() {
+  return (
+    <Router>
+      <div>
+        <ul>
+          <li>
+            <Link to="/">Login</Link>
+          </li>
+          <li>
+            <Link to="/signup">Signup</Link>
+          </li>
+        </ul>
 
-class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      items: [],
-      isLoaded: false,
-      modalIsOpen: false,
-    };
-
-    this.openModal = this.openModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-    this.getItems = this.getItems.bind(this);
-  }
-
-  componentDidMount() {
-    this.getItems();
-  }
-
-  getItems() {
-    axios.get('http://127.0.0.1:8000/api/v1/users/')
-    .then(response => {
-      this.setState({
-        isLoaded: true,
-        items: response.data,
-      })
-    });
-  }
-
-  openModal(item) {
-    this.setState({
-      modalIsOpen: true,
-      updateItemName: item.name
-    });
-  }
-
-  closeModal() {
-    this.setState({modalIsOpen: false});
-  }
-
-  render() {
-    var { isLoaded, items } = this.state;
-    
-    console.log(isLoaded);
-    console.log(items);
-
-    if( !isLoaded ){
-      return <div>Loading...</div>
-    }
-    else { 
-      return (
-        <div className="App"> 
-          <ul className="list-group list-group-flush">
-            {items.map(item => (
-              <li className="list-group-item" key={item.id}>
-                <label className="label">Email:</label> {item.email} | 
-                <label className="label">Username:</label> {item.username} | 
-                <label className="label">First Name:</label> {item.first_name} |
-                <label className="label">Last Name:</label> {item.last_name} |
-              </li>
-            ))}
-          </ul>
-
-        </div>
-      );
-    }
-  }
+        <hr />
+        <Switch>
+          <Route exact path="/">
+            <Login />
+          </Route>
+          <Route path="/signup">
+            <Signup />
+          </Route>
+        </Switch>
+      </div>
+    </Router>
+  );
 }
 
-// function App() {
-//   return (
-//     <div className="App">
-//       <header className="App-header">
-//         <img src={logo} className="App-logo" alt="logo" />
-//         <p>
-//           Edit <code>src/App.js</code> and save to reload.
-//         </p>
-//         <a
-//           className="App-link"
-//           href="https://reactjs.org"
-//           target="_blank"
-//           rel="noopener noreferrer"
-//         >
-//           Learn React
-//         </a>
-//       </header>
-//     </div>
-//   );
-// }
+function Login() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-export default App;
+  function validateForm() {
+    return username.length > 0 && password.length > 0;
+  }
+
+  function loginSubmit(event) {
+    event.preventDefault();
+
+    axios({
+      method: 'post',
+      url: 'http://127.0.0.1:8000/api/v1/rest-auth/login/',
+      data: {
+          username: username,
+          password: password,
+      }
+    }).then(obj => {
+        console.log(obj.data);
+    })
+  }
+
+  return (
+    <div>
+      <h2>Login</h2>
+      <div className="Login">
+        <form onSubmit={loginSubmit}>
+          <FormGroup controlId="username" bsSize="large">
+            <label>Username</label>
+            <FormControl
+              autoFocus
+              type="username"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
+            />
+          </FormGroup>
+          <FormGroup controlId="password" bsSize="large">
+            <label>Password</label>
+            <FormControl
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              type="password"
+            />
+          </FormGroup>
+          <Button block bsSize="large" disabled={!validateForm()} type="submit">
+            Login
+          </Button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function Signup() {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password1, setPassword1] = useState("");
+  const [password2, setPassword2] = useState("");
+
+  function validateForm() {
+    var items = username.length > 0 && 
+            password1.length > 0 && 
+            password2.length > 0 && 
+            email.length > 0;
+    var passwords = password1 == password2;
+
+    if(!items){
+
+    }else if(!passwords){
+
+    }else{
+      return true;
+    }
+  }
+
+  function signupSubmit(event) {
+    event.preventDefault();
+
+    axios({
+      method: 'post',
+      url: 'http://127.0.0.1:8000/api/v1/rest-auth/registration/',
+      data: {
+          username: username,
+          email: email,
+          password1: password1,
+          password2: password2,
+      }
+    }).then(obj => {
+        console.log(obj.data);
+    })
+  }
+
+  return (
+    <div>
+    <h2>Signup</h2>
+
+    <div className="Signup">
+      <form onSubmit={signupSubmit}>
+        <FormGroup controlId="username" bsSize="large">
+          <label>Username</label>
+          <FormControl
+            autoFocus
+            type="username"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup controlId="email" bsSize="large">
+          <label>Email</label>
+          <FormControl
+            autoFocus
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup controlId="password" bsSize="large">
+          <label>Password</label>
+          <FormControl
+            value={password1}
+            onChange={e => setPassword1(e.target.value)}
+            type="password"
+          />
+        </FormGroup>
+        <FormGroup controlId="password" bsSize="large">
+          <label>Confirm Password</label>
+          <FormControl
+            value={password2}
+            onChange={e => setPassword2(e.target.value)}
+            type="password"
+          />
+        </FormGroup>
+        <Button block bsSize="large" disabled={!validateForm()} type="submit">
+          Login
+        </Button>
+      </form>
+    </div>
+  </div>
+  );
+}
+
