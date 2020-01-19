@@ -68,7 +68,7 @@ function Login() {
     event.preventDefault();
     axios({
       method: "post",
-      url: "http://127.0.0.1:8000/api/v1/rest-auth/login/",
+      url: "https://django-payment-tracking.herokuapp.com/api/v1/rest-auth/login/",
       data: {
         username: username,
         password: password
@@ -144,7 +144,7 @@ function Signup() {
 
     axios({
       method: "post",
-      url: "http://127.0.0.1:8000/api/v1/rest-auth/registration/",
+      url: "https://django-payment-tracking.herokuapp.com/api/v1/rest-auth/registration/",
       data: {
         username: username,
         email: email,
@@ -203,7 +203,7 @@ function Signup() {
               />
             </FormGroup>
             <Button block disabled={!validateForm()} type="submit">
-              Login
+              Sign Up
             </Button>
           </form>
         </div>
@@ -260,7 +260,7 @@ function Dashboard() {
   function getTransactions() {
     axios({
       method: "get",
-      url: "http://127.0.0.1:8000/api/v1/transactions/",
+      url: "https://django-payment-tracking.herokuapp.com/api/v1/transactions/",
       params: {}
     }).then(obj => {
       console.log(obj.data);
@@ -272,7 +272,7 @@ function Dashboard() {
     event.preventDefault();
     axios({
       method: "post",
-      url: "http://127.0.0.1:8000/api/v1/transactions/",
+      url: "https://django-payment-tracking.herokuapp.com/api/v1/transactions/",
       data: {
         note: note,
         amount_cents: amountCents,
@@ -293,7 +293,7 @@ function Dashboard() {
     event.preventDefault();
     axios({
       method: "put",
-      url: "http://127.0.0.1:8000/api/v1/users/" + userId,
+      url: "https://django-payment-tracking.herokuapp.com/api/v1/users/" + userId,
       data: {
         first_name: firstName,
         last_name: lastName,
@@ -312,7 +312,7 @@ function Dashboard() {
     event.preventDefault();
     axios({
       method: "get",
-      url: "http://127.0.0.1:8000/api/v1/send-mail/",
+      url: "https://django-payment-tracking.herokuapp.com/api/v1/send-mail/",
       params: {
         username: usernameForEmail,
       }
@@ -329,7 +329,7 @@ function Dashboard() {
     event.preventDefault();
     axios({
       method: "get",
-      url: "http://127.0.0.1:8000/api/v1/users/",
+      url: "https://django-payment-tracking.herokuapp.com/api/v1/users/",
       params: {}
     }).then(obj => {
       console.log(obj.data);
