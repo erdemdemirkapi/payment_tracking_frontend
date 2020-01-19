@@ -311,9 +311,9 @@ function Dashboard() {
   function sendEmail(event) {
     event.preventDefault();
     axios({
-      method: "post",
-      url: "http://127.0.0.1:8000/api/v1/send-mail",
-      data: {
+      method: "get",
+      url: "http://127.0.0.1:8000/api/v1/send-mail/",
+      params: {
         username: usernameForEmail,
       }
     }).then(obj => {
@@ -327,7 +327,6 @@ function Dashboard() {
 
   function getAllUsers(event){
     event.preventDefault();
-
     axios({
       method: "get",
       url: "http://127.0.0.1:8000/api/v1/users/",
