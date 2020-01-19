@@ -231,6 +231,8 @@ function Dashboard() {
   const [usernameForEmail, setUsernameForEmail] = useState("");
   const [modalEmailIsOpen, setModalEmailIsOpen] = React.useState(false);
 
+  const [userData, setUserData] = useState(null);
+
   function openModal() {
     setIsOpen(true);
   }
@@ -321,6 +323,20 @@ function Dashboard() {
         console.log("error");
       }
     });
+  }
+
+  function getAllUsers(event){
+    event.preventDefault();
+
+    axios({
+      method: "get",
+      url: "http://127.0.0.1:8000/api/v1/users/",
+      params: {}
+    }).then(obj => {
+      console.log(obj.data);
+      setUserData(obj.data);
+    });
+
   }
 
   return (
@@ -495,6 +511,26 @@ function Dashboard() {
             </Button>
           </form>
         </Modal>
+      </div>
+
+      <div>
+        {!userData && <Button className='m-2' type="submit" onClick={getAllUsers}>
+        Get All User Info
+        </Button>}
+        {userData && <div>
+          <ul className="list-group list-group-flush">
+            {userData.map(item => (
+              <li className="list-group-item" key={item.id}>
+                <label className="label">Id:</label> {item.id} |
+                <label className="label">Username:</label> {item.username} |
+                <label className="label">Email:</label> {item.email} |
+                <label className="label">First Name:</label> {item.first_name} |
+                <label className="label">Last Name:</label> {item.last_name} |
+                <label className="label">Iban:</label> {item.iban}
+              </li>
+            ))}
+          </ul>
+        </div>}
       </div>
 
     </div>
