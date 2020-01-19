@@ -8,6 +8,7 @@ import {
   Link,
   Redirect
 } from "react-router-dom";
+import "./dashboard.css";
 import "./login.css";
 import "./signup.css";
 import "./App.css";
@@ -93,7 +94,7 @@ function Login() {
               <label>Username</label>
               <FormControl
                 autoFocus
-                type="username"
+                type="text"
                 value={username}
                 onChange={e => setUsername(e.target.value)}
               />
@@ -163,7 +164,7 @@ function Signup() {
             <label>Username</label>
             <FormControl
               autoFocus
-              type="username"
+              type="text"
               value={username}
               onChange={e => setUsername(e.target.value)}
             />
@@ -208,11 +209,18 @@ function Dashboard() {
   const [note, setNote] = useState("");
   const [amountCents, setAmountCents] = useState(0);
   const [amountCurrency, setAmountCurrency] = useState("");
-  const [username, setUsername] = useState("");
-  const [toWhomUsername, setToWhomUsername] = useState("");
-  const [state, setState] = useState("");
-
+  const [userId, setUserId] = useState("");
+  const [toWhomId, setToWhomUserId] = useState("");
   const [modalIsOpen, setIsOpen] = React.useState(false);
+
+  //const [userId, setUserId] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState(0);
+  const [iban, setIban] = useState("");
+  const [modalUpdateIsOpen, setUpdateModalIsOpen] = React.useState(false);
+
+  const [usernameForEmail, setUsernameForEmail] = useState("");
+  const [modalEmailIsOpen, setModalEmailIsOpen] = React.useState(false);
 
   function openModal() {
     setIsOpen(true);
@@ -220,6 +228,22 @@ function Dashboard() {
 
   function closeModal(){
     setIsOpen(false);
+  }
+
+  function openModalUpdateUser() {
+    setUpdateModalIsOpen(true);
+  }
+
+  function closeModalUpdateUser(){
+    setUpdateModalIsOpen(false);
+  }
+
+  function openModalEmail() {
+    setModalEmailIsOpen(true);
+  }
+
+  function closeModalEmail(){
+    setModalEmailIsOpen(false);
   }
 
   function getTransactions() {
@@ -233,7 +257,8 @@ function Dashboard() {
     });
   }
 
-  function addTransactions() {
+  function addTransactions(event) {
+    event.preventDefault();
     axios({
       method: "post",
       url: "http://127.0.0.1:8000/api/v1/transactions/",
@@ -241,9 +266,44 @@ function Dashboard() {
         note: note,
         amount_cents: amountCents,
         amount_currency: amountCurrency,
-        username: username,
-        to_whom_username: toWhomUsername,
-        state: state
+        user: userId,
+        to_whom: toWhomId,
+      }
+    }).then(obj => {
+      if (obj.status === 200 || obj.status === 201) {
+        console.log("succesful");
+      } else {
+        console.log("error");
+      }
+    });
+  }
+
+  function updateUser(event) {
+    event.preventDefault();
+    axios({
+      method: "put",
+      url: "http://127.0.0.1:8000/api/v1/users/" + userId,
+      data: {
+        first_name: firstName,
+        last_name: lastName,
+        iban: iban,
+      }
+    }).then(obj => {
+      if (obj.status === 200) {
+        console.log("succesful");
+      } else {
+        console.log("error");
+      }
+    });
+  }
+
+  function sendEmail(event) {
+    event.preventDefault();
+    axios({
+      method: "post",
+      url: "http://127.0.0.1:8000/api/v1/send-mail",
+      data: {
+        username: usernameForEmail,
       }
     }).then(obj => {
       if (obj.status === 200) {
@@ -255,9 +315,9 @@ function Dashboard() {
   }
 
   return (
-    <div>
+    <div className='container align-items-center'>
       <h2>Dashboard</h2>
-      {!data && <Button block type="submit" onClick={getTransactions}>
+      {!data && <Button className='m-2' type="submit" onClick={getTransactions}>
         Get Transactions
       </Button>}
       {data && <div>
@@ -277,7 +337,7 @@ function Dashboard() {
       </div>}
 
       <div>
-      <Button block type="submit" onClick={openModal}>
+      <Button className='m-2' type="submit" onClick={openModal}>
         Add Transactions
       </Button>
         <Modal
@@ -292,7 +352,7 @@ function Dashboard() {
               <label>Note</label>
               <FormControl
                 autoFocus
-                type="note"
+                type="text"
                 value={note}
                 onChange={e => setNote(e.target.value)}
               />
@@ -301,7 +361,7 @@ function Dashboard() {
               <label>Amount Cents</label>
               <FormControl
                 autoFocus
-                type="amount_cents"
+                type="text"
                 value={amountCents}
                 onChange={e => setAmountCents(e.target.value)}
               />
@@ -311,23 +371,23 @@ function Dashboard() {
               <FormControl
                 value={amountCurrency}
                 onChange={e => setAmountCurrency(e.target.value)}
-                type="amount_currency"
+                type="text"
               />
             </FormGroup>
-            <FormGroup controlId="username">
-              <label>Your Username</label>
+            <FormGroup controlId="user_id">
+              <label>Your User Id</label>
               <FormControl
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-                type="username"
+                value={userId}
+                onChange={e => setUserId(e.target.value)}
+                type="text"
               />
             </FormGroup>
             <FormGroup controlId="to_whom_username">
-              <label>To Whom Username</label>
+              <label>To Whom User Id</label>
               <FormControl
-                value={toWhomUsername}
-                onChange={e => setToWhomUsername(e.target.value)}
-                type="to_whom_username"
+                value={toWhomId}
+                onChange={e => setToWhomUserId(e.target.value)}
+                type="text"
               />
             </FormGroup>
             <Button block type="submit">
@@ -339,6 +399,95 @@ function Dashboard() {
           </form>
         </Modal>
       </div>
+
+      <div>
+      <Button className='m-2' type="submit" onClick={openModalUpdateUser}>
+        Update User
+      </Button>
+        <Modal
+          isOpen={modalUpdateIsOpen}
+          onRequestClose={closeModalUpdateUser}
+          style={customStyles}
+          contentLabel="Update User Modal"
+        >
+          <h2>Update User</h2>
+          <form onSubmit={updateUser}>
+            <FormGroup controlId="user_id">
+              <label>User Id</label>
+              <FormControl
+                autoFocus
+                type="text"
+                value={userId}
+                onChange={e => setUserId(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup controlId="first_name">
+              <label>First Name</label>
+              <FormControl
+                autoFocus
+                type="text"
+                value={firstName}
+                onChange={e => setFirstName(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup controlId="last_name">
+              <label>Last Name</label>
+              <FormControl
+                autoFocus
+                type="text"
+                value={lastName}
+                onChange={e => setLastName(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup controlId="iban">
+              <label>Iban</label>
+              <FormControl
+                value={iban}
+                onChange={e => setIban(e.target.value)}
+                type="text"
+              />
+            </FormGroup>
+            <Button block type="submit">
+              Update
+            </Button>
+            <Button block type="submit" onClick={closeModalUpdateUser}>
+              Close
+            </Button>
+          </form>
+        </Modal>
+      </div>
+
+      <div>
+        <Button className='m-2' type="submit" onClick={openModalEmail}>
+          Send Email
+        </Button>
+
+        <Modal
+          isOpen={modalEmailIsOpen}
+          onRequestClose={closeModalEmail}
+          style={customStyles}
+          contentLabel="Update User Modal"
+        >
+          <h2>Send Email</h2>
+          <form onSubmit={sendEmail}>
+            <FormGroup controlId="username">
+              <label>Username</label>
+              <FormControl
+                value={usernameForEmail}
+                onChange={e => setUsernameForEmail(e.target.value)}
+                type="username"
+              />
+            </FormGroup>
+            <Button block type="submit">
+              Send
+            </Button>
+            <Button block type="submit" onClick={closeModalEmail}>
+              Close
+            </Button>
+          </form>
+        </Modal>
+      </div>
+
     </div>
   );
 }
