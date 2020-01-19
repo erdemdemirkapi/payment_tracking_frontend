@@ -122,6 +122,7 @@ function Signup() {
   const [email, setEmail] = useState("");
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
+  const [isSignedUp, setIsSignedUp] = useState(false);
 
   function validateForm() {
     var items =
@@ -151,55 +152,63 @@ function Signup() {
         password2: password2
       }
     }).then(obj => {
-      console.log(obj.data);
+      if (obj.status === 200 || obj.status === 201) {
+        console.log("succesful");
+        setIsSignedUp(true);
+      } else {
+        console.log("error");
+      }
     });
   }
 
   return (
-    <div>
-      <h2>Signup</h2>
-      <div className="Signup">
-        <form onSubmit={signupSubmit}>
-          <FormGroup controlId="username">
-            <label>Username</label>
-            <FormControl
-              autoFocus
-              type="text"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-            />
-          </FormGroup>
-          <FormGroup controlId="email">
-            <label>Email</label>
-            <FormControl
-              autoFocus
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-            />
-          </FormGroup>
-          <FormGroup controlId="password1">
-            <label>Password</label>
-            <FormControl
-              value={password1}
-              onChange={e => setPassword1(e.target.value)}
-              type="password"
-            />
-          </FormGroup>
-          <FormGroup controlId="password2">
-            <label>Confirm Password</label>
-            <FormControl
-              value={password2}
-              onChange={e => setPassword2(e.target.value)}
-              type="password"
-            />
-          </FormGroup>
-          <Button block disabled={!validateForm()} type="submit">
-            Login
-          </Button>
-        </form>
+    <React.Fragment>
+      {isSignedUp && <Redirect to="/dashboard" />}
+      <div>
+        <h2>Signup</h2>
+        <div className="Signup">
+          <form onSubmit={signupSubmit}>
+            <FormGroup controlId="username">
+              <label>Username</label>
+              <FormControl
+                autoFocus
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup controlId="email">
+              <label>Email</label>
+              <FormControl
+                autoFocus
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup controlId="password1">
+              <label>Password</label>
+              <FormControl
+                value={password1}
+                onChange={e => setPassword1(e.target.value)}
+                type="password"
+              />
+            </FormGroup>
+            <FormGroup controlId="password2">
+              <label>Confirm Password</label>
+              <FormControl
+                value={password2}
+                onChange={e => setPassword2(e.target.value)}
+                type="password"
+              />
+            </FormGroup>
+            <Button block disabled={!validateForm()} type="submit">
+              Login
+            </Button>
+          </form>
+        </div>
       </div>
-    </div>
+    </React.Fragment>
   );
 }
 
